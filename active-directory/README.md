@@ -1,6 +1,6 @@
-# ud-activedirectory
+# Active Directory
 
-Active Directory Dashboard built on Universal.
+Active Directory Universal Template. 
 
 ## Features 
 
