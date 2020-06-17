@@ -1,4 +1,6 @@
-New-UDPage -Name "Search" -Icon search -Content {
+New-UDPage -Name "Search" -Content {
+
+    New-AppBar -Title 'Search'
 
     New-UDElement -Tag "div" -Attributes @{
         style = @{
@@ -6,39 +8,40 @@ New-UDPage -Name "Search" -Icon search -Content {
         }
     }
 
-    New-UDRow -Columns {
-        New-UDColumn -Size 10 -SmallOffset 1 -Content {
-            New-UDRow -Columns {
-                New-UDColumn -Size 10 -Content {
-                    New-UDTextbox -Id "txtSearch" -Label "Search" -Placeholder "Search for an object" -Icon search
-                }
-                New-UDColumn -Size 2 -Content {
-                    New-UDButton -Id "btnSearch" -Text "Search" -Icon search -OnClick {
-                        $Element = Get-UDElement -Id "txtSearch" 
-                        $Value = $Element.Attributes["value"]
-        
-                        Set-UDElement -Id "results" -Content {
-                            New-UDGrid -Title "Search Results for: $Value" -Headers @("Name", "More Info") -Properties @("Name", "MoreInfo") -Endpoint {
-                                $Objects = Get-ADObject -Filter "Name -like '$Value' -or samAccountName -like '$Value'" -ResultSetSize 20 @Cache:ConnectionInfo -IncludeDeletedObjects
-                                $Objects | ForEach-Object {
-                                    [PSCustomObject]@{
-                                        Name = $_.Name
-                                        MoreInfo = New-UDButton -Text "More Info" -OnClick {
-                                            Invoke-UDRedirect -Url "/object/$($_.Name)"
-                                        }
-                                    }
-                                } | Out-UDGridData 
-                            } 
+    New-UDContainer -Content {
+        New-UDGrid -Container -Content {
+            New-UDGrid -Size 10 -Content {
+                New-UDForm -OnSubmit {
+                    $Search = $Body | ConvertFrom-Json 
+                    $Value = $Search.txtSearch
+
+                    $Objects = Get-ADObject -Filter "Name -like '$Value' -or samAccountName -like '$Value'" -ResultSetSize 20 @Cache:ConnectionInfo -IncludeDeletedObjects
+
+                    $Session:SearchResults = $Objects | ForEach-Object {
+                        [PSCustomObject]@{
+                            Name = $_.Name
+                            MoreInfo = New-UDButton -Text "More Info" -OnClick {
+                                Invoke-UDRedirect -Url "/object/$($_.Name)"
+                            }
                         }
-                    }
+                    } 
+
+                    Sync-UDElement -Id searchResults
+                } -Content {
+                    New-UDTextbox -Id "txtSearch" -Label "Search" -Placeholder "Search for an object" 
                 }
             }
         }
-    }
-
-    New-UDRow -Columns {
-        New-UDColumn -SmallSize 10 -SmallOffset 1 {
-            New-UDElement -Tag "div" -Id "results"
+    
+        New-UDGrid -Container -Content {
+            New-UDGrid -SmallSize 10 -Content {
+                New-UDDynamic -Id 'searchResults' -Content {
+                    if ($Session:SearchResults)
+                    {
+                        New-UDTable -Data $Session:SearchResults
+                    }
+                }
+            }
         }
     }
 }

@@ -1,0 +1,1 @@
+New-PSUVariable -Name "ActiveDirectory" -Vault "BuiltInLocalVault" -Type "PSCredential"

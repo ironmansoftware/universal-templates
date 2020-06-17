@@ -1,14 +1,13 @@
 $Cache:Loading = $true
 $Cache:ChartColorPalette = @('#5899DA', '#E8743B', '#19A979', '#ED4A7B', '#945ECF', '#13A4B4', '#525DF4', '#BF399E', '#6C8893', '#EE6868', '#2F6497')
 $ConnectionInfo = @{
-    Server = 'server'
+    Server = 'ironman.local'
     Credential = Get-Secret -Name 'ActiveDirectory'
 }
 
 $Cache:ConnectionInfo = $ConnectionInfo
 
-Import-Module ActiveDirectory -WarningAction SilentlyContinue
-New-PSDrive -Name AD -PSProvider ActiveDirectory @ConnectionInfo -Root '//RootDSE/' -Scope Global | Out-Null
+Import-Module ActiveDirectory -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 
 function New-ADIcon {
     param($ObjectClass, $Size) 
@@ -30,24 +29,42 @@ function New-ADIcon {
     New-UDIcon -Icon $icon -Size $Size
 }
 
+function New-AppBar {
+    param($title)
+
+    $Drawer = New-UDDrawer -Children {
+        New-UDList -Children {
+            New-UDListItem -Label "Home" -OnClick { Invoke-UDRedirect -Url "/home" }
+            New-UDListItem -Label "Deleted Objects" -OnClick { Invoke-UDRedirect -Url "/deleted-objects" }
+            New-UDListItem -Label "Explorer" -OnClick { Invoke-UDRedirect -Url "/powershell-universal-dashboard" }
+            New-UDListItem -Label "Search" -OnClick { Invoke-UDRedirect -Url "/search" }
+            New-UDListItem -Label "User Management" -Children {
+                New-UDListItem -Label "Add User to Group" -OnClick { Invoke-UDRedirect -Url "/user/add-to-group" }
+                New-UDListItem -Label "Create User" -OnClick { Invoke-UDRedirect -Url "/user/create" }
+                New-UDListItem -Label "Reset Password" -OnClick { Invoke-UDRedirect -Url "/user/reset-password" }
+            }
+        }
+    }
+
+    New-UDAppbar -Children {
+        New-UDElement -Tag 'div' -Content {$title}
+    } -Drawer $Drawer
+}
+
+$Complete = @("home", "search", "add-to-group", "create-user", 'reset-password', 'deleted-objects')
+
 $Pages = Get-ChildItem (Join-Path $PSScriptRoot 'pages') -Recurse -File | ForEach-Object {
-    & $_.FullName
+    foreach($page in $Complete)
+    {
+        if ($_.FullName.Contains($page))
+        {
+            . $_.FullName
+        }
+    }  
 } 
 
 Get-ChildItem (Join-Path $PSScriptRoot 'endpoints') | ForEach-Object {
-    & $_.FullName
+    . $_.FullName
 } | Out-Null
 
-$Navigation = New-UDSideNav -Content {
-    New-UDSideNavItem -Text 'Home' -Url 'Home' -Icon home
-    New-UDSideNavItem -Text 'Deleted Objects' -Url 'deleted-objects' -Icon user_times
-    New-UDSideNavItem -Text 'Explorer' -Url 'Explorer' -Icon folder
-    New-UDSideNavItem -Text 'Search' -Url 'Search' -Icon search
-    New-UDSideNavItem -Text 'User Management' -Icon user  -Children {
-        New-UDSideNavItem -Text 'Add User To Group' -Url 'user/add-to-group' -Icon user_plus
-        New-UDSideNavItem -Text 'Create User' -Url 'user/create' -Icon plus_circle
-        New-UDSideNavItem -Text 'Reset Password' -Url 'user/reset-password' -Icon code
-    }
-}
-
-New-UDDashboard -Pages $Pages -Navigation $Navigation -Title 'AD'
+New-UDDashboard -Pages $Pages -Title 'Active Directory'

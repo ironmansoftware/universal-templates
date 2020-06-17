@@ -2,7 +2,6 @@ New-UDEndpoint -Endpoint {
     try
     {
         Import-Module ActiveDirectory -WarningAction SilentlyContinue
-        New-PSDrive -Name AD -PSProvider ActiveDirectory @ConnectionInfo -Root '//RootDSE/' -Scope Global | Out-Null
 
         $Objects = Get-ADObject -Filter { Name -like '*'} @Cache:ConnectionInfo
         $Cache:Classes = $Objects | Group-Object -Property ObjectClass | Sort-Object -Property Count -Descending | Select-Object -First 10
@@ -11,18 +10,18 @@ New-UDEndpoint -Endpoint {
 
         $DomainControllers = Get-ADDomainController -Filter {Name -like '*'} @Cache:ConnectionInfo
 
-        $Cache:Computers = @{
-            Total                = ($Computers | Measure-Object).Count
-            Disabled             = ($Computers | Where-Object Enabled -eq $false | Measure-Object).Count
-            'Domain Controllers' = ($DomainControllers | Measure-Object).Count
-        }.GetEnumerator()
+        $Cache:Computers = @(
+            @{ Name = "Total"; Value = ($Computers | Measure-Object).Count }
+            @{ Name = "Disabled"; Value = ($Computers | Where-Object Enabled -eq $false | Measure-Object).Count }
+            @{ Name = "Domain Controllers"; Value = ($DomainControllers | Measure-Object).Count }
+        )
 
         $Users = Get-ADUser -Filter { Name -like '*'} @Cache:ConnectionInfo -Properties *
 
-        $Cache:Users = @{
-            Total    = ($Users | Measure-Object).Count
-            Disabled = ($Users | Where-Object Enabled -eq $false | Measure-Object).Count
-        }.GetEnumerator()
+        $Cache:Users = @(
+            @{ Name = "Total"; Value = ($Users | Measure-Object).Count }
+            @{ Name = "Disabled"; Value = ($Users | Where-Object Enabled -eq $false | Measure-Object).Count }
+        )
 
         $Cache:Forest = Get-ADForest @Cache:ConnectionInfo
         $Cache:Domains = Get-ADDomain @Cache:ConnectionInfo

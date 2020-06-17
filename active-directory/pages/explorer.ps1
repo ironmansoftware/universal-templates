@@ -1,6 +1,6 @@
-New-UDPage -Name "Explorer" -Icon folder -Content {
-    New-UDRow -Columns {
-        New-UDColumn -SmallSize 12 -LargeSize 3 -Content {
+New-UDPage -Name "Explorer" -Content {
+    New-UDGrid -Container -Content {
+        New-UDGrid -SmallSize 12 -LargeSize 3 -Content {
 
             $Domain = Get-ADDomain @Cache:ConnectionInfo 
 

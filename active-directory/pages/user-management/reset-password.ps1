@@ -1,24 +1,21 @@
-New-UDPage -Name 'Reset Password' -Url "/user/reset-password" -Icon Plus -Endpoint {
-    New-UDRow -Columns {
-        New-UDColumn -Size 12 -Content {
-            New-UDInput -Title "Reset Password" -SubmitText "Reset Password" -Content {
-                New-UDInputField -Name "UserName" -Placeholder "Account Name" -Type "textbox"
-                New-UDInputField -Name "Password" -Placeholder "Password" -Type "password"
-            } -Endpoint {
-                param(
-                    $UserName,
-                    $Password
-                )
-        
+New-UDPage -Name 'Reset Password' -Url "/user/reset-password" -Endpoint {
+    New-AppBar -Title 'Reset Password'
+    
+    New-UDGrid -Container -Content {
+        New-UDGrid -Size 12 -Content {
+            New-UDForm -Content {
+                New-UDTextbox -Id 'txtUserName' -Placeholder 'Account Name'
+                New-UDTextbox -Id 'txtPassword' -Placeholder 'Password'
+            } -OnSubmit {
                 try 
                 { 
                     $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force
                     Set-ADAccountPassword -Reset -NewPassword $SecurePassword -Identity $UserName @Cache:ConnectionInfo
-                    New-UDInputAction -RedirectUrl "/object/$UserName"
+                    Invoke-UDRedirect -Url "/object/$UserName"
                 }
                 catch 
                 {
-                    New-UDInputAction -Toast "Failed to add user. $_"
+                    Show-UDToast -Message "Failed to add user. $_"
                 }
             }
         }
