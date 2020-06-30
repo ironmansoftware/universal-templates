@@ -3,16 +3,22 @@ param(
     [PSCredential]$Credential
 )
 
-#
-#   You can call whatever cmdlets you like to conduct authentication here.
-#   Just make sure to return the $Result with the Success property set to $true
-#
-
 $Result = [Security.AuthenticationResult]::new()
 if ($Credential.UserName -eq 'Admin') 
 {
-    $Result.UserName = 'Admin'
+    #Maintain the out of box admin user
+    $Result.UserName = 'Default Admin'
     $Result.Success = $true 
 }
+else
+{
+    $User = Get-ADUser -Identity $Credential.UserName -Server ironman.local -Credential $Credential -ErrorAction SilentlyContinue
+    if ($null -ne $User)
+    {
+        $Result.UserName = ($Credential.UserName)
+        $Result.Success = $true 
+    }
+}
+
 $Result
  }

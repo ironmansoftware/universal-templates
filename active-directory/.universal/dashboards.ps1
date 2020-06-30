@@ -1,1 +1,1 @@
-New-PSUDashboard -Name "ActiveDirectory" -FilePath "ActiveDirectory.ps1" -BaseUrl "/" -Framework "UniversalDashboard:3.0.0-beta5" -PowerShellVersion '7.0.2'
+New-PSUDashboard -Name "Help Desk" -FilePath "Help Desk.ps1" -BaseUrl "/" -Framework "UniversalDashboard:3.0.0-beta6"
