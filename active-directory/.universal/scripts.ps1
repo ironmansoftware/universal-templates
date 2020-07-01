@@ -1,0 +1,1 @@
+New-PSUScript -Name "Reset Password.ps1" -Path "Reset Password.ps1" -InformationAction "Continue" -ErrorAction "Stop"
