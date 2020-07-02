@@ -1,8 +1,43 @@
 $Server = 'ironman.local'
 $Credential = Get-Secret -Name 'Domain'
 
-New-UDDashboard -Title "Active Directory Help Desk" -Content {
+Import-Module "$Env:ProgramData\PowerShellUniversal\Dashboard\Components\UniversalDashboard.Charts\1.0.0\UniversalDashboard.Charts.psd1"
 
+$Pages = @()
+
+$Pages += New-UDPage -Name 'Dashboard' -Content {
+    $LatestComputerReport = Get-UAScript -Name 'Computer Report.ps1' | Get-UAJob -OrderBy Id -OrderDirection Descending -First 1 | Get-UAJobPipelineOutput
+    New-UDNivoChart -Data $LatestComputerReport.OperatingSystem -Bar -Keys "count" -IndexBy 'name' -Height 500 -Responsive
+    New-UDNivoChart -Data $LatestComputerReport.OperatingSystemServicePack -Bar -Keys "count" -IndexBy 'name' -Height 500 -Responsive
+    New-UDNivoChart -Data $LatestComputerReport.Location -Pie 
+
+    $LastTenComputerReports = Get-UAScript -Name 'Computer Report.ps1' | Get-UAJob -OrderBy Id -OrderDirection Ascending -First 25 | Get-UAJobPipelineOutput
+    
+    $Data = @()
+    foreach($jobOutput in $LastTenComputerReports)
+    {
+        $Location = $jobOutput.Location
+        
+        $record = @{}
+        $Location | ForEach-Object {
+
+            if ($_.Label -ne $null) 
+            {
+                $record[$_.Label.Split(',')[0]] = [int]$_.Value
+            }
+        }
+
+        if ($record.Count -ne 0)
+        {
+            $Data += $record
+        }
+    }
+    
+    New-UDNivoChart -Stream -Data $Data -Height 500 -Responsive -Keys @('hailey', 'madison')
+}
+
+
+$Pages += New-UDPage -Name 'Toolbox' -Content {
     New-UDGrid -Container -Content {
         New-UDGrid -Size 6 -Content {
             New-UDCard -Title 'View User' -Content {
@@ -78,3 +113,5 @@ New-UDDashboard -Title "Active Directory Help Desk" -Content {
         
     }
 }
+
+New-UDDashboard -Title "Active Directory Help Desk" -Pages $Pages

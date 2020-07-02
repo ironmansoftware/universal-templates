@@ -1,0 +1,1 @@
+New-PSUSchedule -Cron "0 * * * *" -Script "Computer Report.ps1" -TimeZone "America/Denver"
