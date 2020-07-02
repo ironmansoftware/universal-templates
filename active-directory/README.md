@@ -1,9 +1,13 @@
-# Active Directory
+# Active Directory Help Desk
 
 Active Directory Universal Template. 
 
+## Description
+
+This template provides a set of functionality for an Active Directory help desk. This template was made as part of a blog series for PowerShell Universal. You can click the features below to see the accompanying blog post. 
+
 ## Features 
 
-- View Users
-- Reset Passwords
-- Report on Computers
+- [View Users](https://ironmansoftware.com/active-directory-help-desk-view-users/)
+- [Reset Passwords](https://ironmansoftware.com/active-directory-help-desk-reset-password/)
+- [Computer Report]()
