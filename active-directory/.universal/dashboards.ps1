@@ -1,1 +1,1 @@
-New-PSUDashboard -Name "Help Desk" -Authenticated -GrantAppToken -FilePath "Help Desk.ps1" -BaseUrl "/" -Framework "UniversalDashboard:3.0.0-beta6" 
+New-PSUDashboard -Name "Help Desk" -FilePath "Help Desk.ps1" -BaseUrl "/" -Framework "UniversalDashboard:3.0.0-beta7" -Authenticated -GrantAppToken

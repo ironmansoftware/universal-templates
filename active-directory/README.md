@@ -10,4 +10,5 @@ This template provides a set of functionality for an Active Directory help desk.
 
 - [View Users](https://ironmansoftware.com/active-directory-help-desk-view-users/)
 - [Reset Passwords](https://ironmansoftware.com/active-directory-help-desk-reset-password/)
-- [Computer Report]()
+- [Computer Report](https://ironmansoftware.com/active-directory-help-desk-computer-report/)
+- [Restore Deleted Users](https://ironmansoftware.com/active-directory-help-desk-restore-deleted-users/)

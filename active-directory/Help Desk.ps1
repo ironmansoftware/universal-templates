@@ -38,8 +38,39 @@ $Pages += New-UDPage -Name 'Dashboard' -Content {
 
 
 $Pages += New-UDPage -Name 'Toolbox' -Content {
-    New-UDGrid -Container -Content {
-        New-UDGrid -Size 6 -Content {
+    New-UDTabs -Tabs {
+
+        New-UDTab -Text 'Restore User' -Content {
+
+            $Columns = @(
+                New-UDTableColumn -Property Name -Title "Name"
+                New-UDTableColumn -Property DistinguishedName -Title "Distinguished Name"
+                New-UDTableColumn -Property DistinguishedName -Title Restore -Render {
+                    $Item = $Body | ConvertFrom-Json 
+                    New-UDButton -Id "btn$($Item.ObjectGuid)" -Text "Restore" -OnClick { 
+                        Show-UDToast -Message "Restoring user $($Item.Name)" -Duration 5000
+
+                        Invoke-UAScript -Name 'Restore User.ps1' -DistinguishedName $Item.DistinguishedName | Tee-Object -Variable job | Wait-UAJob
+
+                        $Job = Get-UAJob -Id $Job.Id 
+                        if ($Job.Status -eq 'Completed')
+                        {
+                            Show-UDToast -Message "Restored user $($Item.Name)" -Duration 5000
+                        }
+                        else 
+                        {
+                            $Output = Get-UAJobOutput -JobId $Job.Id | Select-Object -Expand Message
+                            Show-UDToast -Message "Failed to restore user. $($Output -join "`n")" -BackgroundColor red -MessageColor white -Duration 5000
+                        }
+                    }
+                }
+            )
+
+            $DeletedUsers = Get-ADObject -Filter 'IsDeleted -eq $true -and objectClass -eq "user"' -Server $Server -Credential $Credential -IncludeDeletedObjects
+            New-UDTable -Data $DeletedUsers -Columns $Columns
+        }
+
+        New-UDTab -Text 'View Users' -Content {
             New-UDCard -Title 'View User' -Content {
 
                 New-UDForm -Content {
@@ -57,8 +88,21 @@ $Pages += New-UDPage -Name 'Toolbox' -Content {
                     }
                 }
             }
+
+            New-UDDynamic -Id 'propertyTable' -Content {
+                if ($Session:UserObject)
+                {
+                    $Columns = @(
+                        New-UDTableColumn -Property Name -Title Name
+                        New-UDTableColumn -Property Value -Title Value 
+                    )
+
+                    New-UDTable -Data $Session:UserObject.PSObject.Properties -Columns $Columns
+                }
+            }
         }
-        New-UDGrid -Size 6 -Content {
+
+        New-UDTab -Text 'Reset Password' -Content {
             New-UDCard -Title 'Reset Password' -Content {
                 New-UDForm -Content {
                     New-UDTextbox -Placeholder 'Identity' -Id 'txtIdentity'
@@ -98,19 +142,6 @@ $Pages += New-UDPage -Name 'Toolbox' -Content {
                 }
             }
         }
-    }
-
-    New-UDDynamic -Id 'propertyTable' -Content {
-        if ($Session:UserObject)
-        {
-            $Columns = @(
-                New-UDTableColumn -Property Name -Title Name
-                New-UDTableColumn -Property Value -Title Value 
-            )
-
-            New-UDTable -Data $Session:UserObject.PSObject.Properties -Columns $Columns
-        }
-        
     }
 }
 
