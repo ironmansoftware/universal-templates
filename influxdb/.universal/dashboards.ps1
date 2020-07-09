@@ -1,0 +1,1 @@
+New-PSUDashboard -Name "Dashboard" -FilePath "Dashboard.ps1" -BaseUrl "/dashboard" -Framework "UniversalDashboard:2.9.1-beta5"

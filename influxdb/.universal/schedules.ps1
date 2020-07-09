@@ -1,0 +1,1 @@
+New-PSUSchedule -Cron "* * * * *" -Script "influxdb.ps1" -TimeZone "America/Denver"

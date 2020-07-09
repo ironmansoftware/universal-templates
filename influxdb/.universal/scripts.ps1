@@ -1,0 +1,1 @@
+New-PSUScript -Name "influxdb.ps1" -Path "influxdb.ps1" -InformationAction "Continue"
