@@ -36,7 +36,6 @@ $Pages += New-UDPage -Name 'Dashboard' -Content {
     New-UDNivoChart -Stream -Data $Data -Height 500 -Responsive -Keys @('hailey', 'madison')
 }
 
-
 $Pages += New-UDPage -Name 'Toolbox' -Content {
     New-UDTabs -Tabs {
 
@@ -143,6 +142,10 @@ $Pages += New-UDPage -Name 'Toolbox' -Content {
             }
         }
     }
+}
+
+$Pages += New-UDPage -Name 'Onboard User' -Content {
+    New-UDStepper -
 }
 
 New-UDDashboard -Title "Active Directory Help Desk" -Pages $Pages
