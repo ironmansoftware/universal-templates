@@ -13,6 +13,9 @@ Universal uses PowerShell scripts to provide idempotent configuration settings. 
 ## Templates Table of Contents 
 
 - [Active Directory](./active-directory)
+- [Hyper-V VM Creator](./hyperv-vm-creator)
+- [InfluxDB](./influxdb)
+- [Magic the Gathering Tracker](./mtg-tracker)
 
 ## Installing Templates
 
