@@ -1,1 +1,1 @@
-New-PSUDashboard -Name "Dashboard" -FilePath "Dashboard.ps1" -BaseUrl "/dashboard" -Framework "UniversalDashboard:2.9.1-beta5"
+New-PSUDashboard -Name "influxdb" -FilePath "influxdb.ps1" -BaseUrl "/dashboard" -Framework "UniversalDashboard:3.1.0" -Component @("UniversalDashboard.Charts:1.2.0")
